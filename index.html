@@ -3,33 +3,252 @@
 <head>
   <meta charset="utf-8">
   <title>Page Title</title>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script type="text/javascript" charset="utf-8">
- 
-  </script>
-
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  
+  <style>
+      
+    path {
+        fill: none;
+        stroke: green;
+        stroke-width:1;
+    }
+    .domain {
+        fill: none;
+        stroke: blue;
+    }
+    
+    .tick line {
+        stroke: grey;
+    }
+   .old-cases{
+     stroke:;
+   }
+  </style>
+  
 </head>
 <body>
-<h1> The Pitch: Cholera's journey across the world </h1>
-<p>Historical cases show that there have been no cases of cholera in Haiti since the 1800s, but in October 2010, Haitians living less than two miles from UN military camp housing Nepalese troops began dying of the disease.</p>
 
-<p>Since then, scientific studies, video documentation and Haitians have come forward with evidence to substantiate the claim that the UN introduced the disease to earthquake-ravaged Haiti.</p>
+  <h1>CHOLERA</h1>
+  <p>Number of cases of cholera in Haiti.</p>
+  
+  <div>
+  <label><input checked="checked" type="radio" name="radio" value="newcases"> New Cases per Day</label>
+  <label><input type="radio" name="radio" value="totalcases"> Total Cases </label>
 
-<p>I would like to make a 2D/3D map data visualization of cholera's journey, from an outbreak in mid-west Nepal, to the capital, Kathmandu, up on board a 40-hour flight that stopped in Karachi, the Azores (via confidential source) and then in Haiti where it fanned out from Mirebalais in the Central district to the Artibonite area and then the rest of Haiti. I would also like to show that it has since caused outbreaks in the Dominican Republic, Cuba (Summer 2012 after a 100 year absence) and Mexico (October 23, 2013).</p>
+  </div>
+  
+  <div class="chart"></div>
+  
 
-<h2>News Angle: Outbreaks and the US</h2>
-<p>The story is newsworthy because vacationers have brought cholera to Chile, Venezuela, Italy, Germany, Holland and even Florida, and all it takes is for one restauranteur and poor hygiene habits for an outbreak to happen (cases in Cuba and Mexico have been traced to restaurants), even with access to clean water. It is also notable that cholera vaccines are not available throughout the US. With 70,000 Cuban Americans visiting Cuba in 2012 and a high number of documented and undocumented Mexicans moving and out of the US, this country is certainly not immune from experiencing an outbreak.</p>
+  <script>
+  
+  
+  var margin = {top: 20, right: 20, bottom: 20, left: 70},
+      padding = {top: 60, right: 60, bottom: 60, left: 60},
+      outerWidth = 2800,
+      outerHeight = 500,
+      innerWidth = outerWidth - margin.left - margin.right,
+      innerHeight = outerHeight - margin.top - margin.bottom,
+      width = innerWidth - padding.left - padding.right,
+      height = innerHeight - padding.top - padding.bottom;
+    
+  d3.csv("haitidata1.csv", function(data){
+      
+        data.forEach(function(d) {
+             d.NewDeaths      = +d.NewDeaths;
+             d.NewCases       = +d.NewCases;
+             d.TotalDead      = +d.TotalDead;
+             d.TotalCases     = +d.TotalCases;
+             d.MortalityRate  = +d.MortalityRate;
+             d.Month          = +d.Month;
+             d.Year           = +d.Year;
+             d.Unix           = +d.Unix;
+             d.PercentagePopWithCholera = +d.PercentagePopWithCholera;
+             
+        });
+      
+        console.log(data);
+        
+        var svg = d3.select(".chart")
+                .append("svg")
+                .attr("width", innerWidth)
+                .attr("height", 500)
+                .append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
-<h2>Data sources: Articles and journals</h2>
-<a href="http://www.thehimalayantimes.com/fullNews.php?headline=Cholera+outbreak+looms+over+capital&NewsID=258974" target="_blank">Outbreak in Kathmandu, Nepal, September 2010</a>
-<br>
-<a href="http://www.ph.ucla.edu/epi/snow/cholera_haiti.html" target="_blank">Research on arrival of UN troops in Haiti (October 2010) and the spread of the disease</a>
-<br>
-<a href="http://wwwnc.cdc.gov/travel/notices/watch/cholera-dominican-republic" target="_blank">CDC issues advisory regarding cholera outbreak in Dominican Republic, December 2010</a>
-<br>
-<a href="https://www.osac.gov/Pages/ContentReportDetails.aspx?cid=14394" target="_blank">U.S. issues advisory regarding cholera outbreak in Cuba, August 2013</a>
-<br>
-<a href="http://www.npr.org/blogs/health/2013/10/23/239803890/haitian-cholera-strain-spreads-to-mainland-with-mexico-outbreak" target="_blank">Cholera travels to Mexico, 200 ill, 1 dead, October 2013</a>
+         /*        
+         var startDate = "30-10-2010"; 
+                startDate = d3.time.format("%d-%m-%Y").parse(startDate); 
+        
+         var xScale = d3.time.scale()
+                .domain([new Date(data[0].Date), d3.time.day.offset(new Date(data[data.length - 1].Date), 1)])
+                .rangeRound([0, width - margin.left - margin.right]);
+                
+         */
+        
+         var xScale = d3.scale.linear()
+               .domain([d3.min(data,function(d){ return d.Unix}), d3.max(data,function(d){ return d.Unix}) ])
+               .range([0, width]);       
+                
+         var yScale = d3.scale.linear()
+                .domain([0, d3.max(data,function(d){ return d.NewCases})])
+                .range([height, 0]);
+                
+            
+          /*      svg.selectAll(".dot")
+                 .data(data)
+                 .enter().append("circle")
+                 .attr("class", "dot")
+                 .attr("r", 1)
+                 .attr("cx", function(d, i) { return xScale(d.Unix); })
+                 .attr("cy", function(d) { return yScale(d.TotalCases); })       
+          */
+      
+          var line = d3.svg.line()
+                 .x(function(d) { return xScale(d.Unix); })
+                 .y(function(d) { return yScale(d.TotalCases); });
+                 
+          var newcaseline = d3.svg.line()
+                  .x(function(d) { return xScale(d.Unix); })
+                  .y(function(d) { return yScale(d.NewCases); });
+                 
+          var totaldeadline = d3.svg.line()
+                  .x(function(d) { return xScale(d.Unix); })
+                  .y(function(d) { return yScale(d.TotalDead); });       
+          
+          
+          var xAxis = d3.svg.axis()
+                  //.tickFormat(function(d) { return d; })
+                  .tickFormat(function(d){ d = d *1000; return new Date(d).getUTCMonth().toString() + "/" + new Date(d).getUTCFullYear().toString();})
+                  .scale(xScale);
 
-<h2>Background: No such visualization</h2>
-<p>There have been pieces of visualization on how cholera traveled from Nepal to Haiti but none show the movement of the disease to Dominican Republic, Cuba and Mexico, with cases traveling to many other countries.</p>
+           svg.append("g")
+                  .attr("class", "axis")
+                  .attr("transform", "translate(0, " + height + ")")
+                  .call(xAxis)
+                  
+           var yAxis = d3.svg.axis()
+                   .tickFormat(function(d) { return d; })
+                   .scale(yScale)
+                   .orient("left");
+          
+          svg.append("g")
+                  .attr("class", "axis")
+                  .attr("class", "new-cases-axis")
+                  .attr("transform", "translate(" + padding + ",0)")
+                  .call(yAxis)
+                  
+          svg.append("path")
+                  .attr("d", newcaseline(data))
+                  .attr("class", "new-cases");
+
+          
+          d3.selectAll("input[value=totalcases]")
+          .on("click", function() {
+            
+                    //get rid of stuff
+                   d3.select(".new-cases")
+                      .remove(); 
+                   d3.select(".new-cases-axis")
+                      .remove();
+                      
+                    var yScaleTotal = d3.scale.linear()
+                           .domain([0, d3.max(data,function(d){ return d.TotalCases})])
+                           .range([height, 0]);
+
+                       var yAxis = d3.svg.axis()
+                               .tickFormat(function(d) { return d; })
+                               .scale(yScaleTotal)
+                               .orient("left");
+
+                      svg.append("g")
+                              .attr("class", "axis")
+                              .attr("class", "old-cases-axis")
+                              .attr("transform", "translate(" + padding + ",0)")
+                              .call(yAxis);
+                            
+                        
+                      var line = d3.svg.line()
+                              .x(function(d) { return xScale(d.Unix); })
+                              .y(function(d) { return yScaleTotal(d.TotalCases); });
+
+                      svg.append("path")
+                              .attr("d", line(data))
+                              .attr("class", "old-cases");     
+                    
+          });
+          
+          d3.selectAll("input[value=newcases]")
+          .on("click", function() {
+            
+                    //get rid of stuff
+                   d3.select(".old-cases")
+                      .remove(); 
+                   d3.select(".old-cases-axis")
+                      .remove();
+                      
+                      var yScale = d3.scale.linear()
+                              .domain([0, d3.max(data,function(d){ return d.NewCases})])
+                              .range([height, 0]);
+
+                      var yAxis = d3.svg.axis()
+                              .tickFormat(function(d) { return d; })
+                              .scale(yScale)
+                              .orient("left");
+
+                      svg.append("g")
+                              .attr("class", "axis")
+                              .attr("class", "new-cases-axis")
+                              .attr("transform", "translate(" + padding + ",0)")
+                              .call(yAxis)
+                        
+                      var line = d3.svg.line()
+                              .x(function(d) { return xScale(d.Unix); })
+                              .y(function(d) { return yScaleTotal(d.TotalCases); });
+
+                      svg.append("path")
+                              .attr("d", newcaseline(data))
+                              .attr("class", "new-cases");
+          });
+          
+           d3.selectAll("input[value=totalcases]")
+            .on("click", function() {
+
+                      //get rid of stuff
+                     d3.select(".new-cases")
+                        .remove(); 
+                     d3.select(".new-cases-axis")
+                        .remove();
+
+                      var yScaleTotal = d3.scale.linear()
+                             .domain([0, d3.max(data,function(d){ return d.TotalCases})])
+                             .range([height, 0]);
+
+                         var yAxis = d3.svg.axis()
+                                 .tickFormat(function(d) { return d; })
+                                 .scale(yScaleTotal)
+                                 .orient("left");
+
+                        svg.append("g")
+                                .attr("class", "axis")
+                                .attr("class", "old-cases-axis")
+                                .attr("transform", "translate(" + padding + ",0)")
+                                .call(yAxis);
+
+
+                        var line = d3.svg.line()
+                                .x(function(d) { return xScale(d.Unix); })
+                                .y(function(d) { return yScaleTotal(d.TotalCases); });
+
+                        svg.append("path")
+                                .attr("d", line(data))
+                                .attr("class", "old-cases");     
+
+            });
+                
+  });
+    
+  </script>
+  
+</body>
+</html>
