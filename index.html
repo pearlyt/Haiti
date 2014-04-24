@@ -7,37 +7,115 @@
   
   <style>
       
+    div.chart {
+          position:relative;
+          padding:10px;
+          top: 300px;
+        }
+        
+    body {
+          font-family:georgia;
+          width: 1400px;
+          margin: 20px auto;
+        }
+
+  	h1 {
+          font-weight: normal;
+          font-size: 30px;
+      	}
+      	
+
+    p {
+          font-size: 13px;
+          line-height: 1.3em;
+        }
+      
+      #chart-title{
+          position:absolute;
+          left:50px;
+          top:5px;
+        }
+
+  		#intro {
+          position: absolute;
+          left: 100px;
+          top:0px;
+          width: 400px;
+          z-index: 100;
+          background-color:white;
+    		}
+    
+     .radiobuttons{
+          font-size: 15px;
+          font-family: georgia;
+          position: relative;
+          left: 95px;
+          top: 0px;
+        }
+    
     path {
-        fill: none;
-        stroke: green;
-        stroke-width:1;
+          fill: none;
+          stroke: green;
+          stroke-width:1;        
     }
+    
     .domain {
         fill: none;
-        stroke: blue;
+        stroke: black;        
     }
+    
     
     .tick line {
         stroke: grey;
     }
-   .old-cases{
+    
+    .old-cases{
      stroke:;
-   }
-  </style>
+    }
+    
+    .axis{
+      stroke:black;
+      font-family:georgia;
+    }
+    
+    .new-cases-axis{
+        stroke:black;
+        font-family:georgia;
+    }
+    
+    .old-cases-axis{
+        stroke:black;
+        font-family:georgia;
+    }    
+    
+
+    
+    </style>
   
 </head>
 <body>
-
-  <h1>CHOLERA</h1>
-  <p>Number of cases of cholera in Haiti.</p>
   
-  <div>
+  	<div id="intro">
+  	<h1>Cholera Reemergence Patterns in Haiti</h1>
+  	<p>
+  		In October 2010, cholera broke out in the Centre Department of Haiti. The country had not seen a single case in over a century. This meant that when Haitians began vomiting and having diarrhea, most of the Haitians alive had never seen its symptoms before.
+  	</p>
+  	<p>
+  	Four years on, the water-borne disease continues to plague Haiti, and has since spread to at least ten other countries, including the Mexico, Cuba, Germany and Venezuela.
+  	</p>
+    <p>
+    Every summer, cholera treatment centers in Haiti are closed down as low rainfall means fewer cases of cholera. But every fall, cholera treatment centers cannot open in time to treat the sick and Haitians continue to die during the monsoon season in October.
+    </p>  
+  	</div>
+  
+  
+    <div class="chart">
+  <div class="radiobuttons">
   <label><input checked="checked" type="radio" name="radio" value="newcases"> New Cases per Day</label>
   <label><input type="radio" name="radio" value="totalcases"> Total Cases </label>
-
   </div>
-  
-  <div class="chart"></div>
+    <div class="chart">
+</div>
   
 
   <script>
@@ -45,7 +123,7 @@
   
   var margin = {top: 20, right: 20, bottom: 20, left: 70},
       padding = {top: 60, right: 60, bottom: 60, left: 60},
-      outerWidth = 2800,
+      outerWidth = 1000,
       outerHeight = 500,
       innerWidth = outerWidth - margin.left - margin.right,
       innerHeight = outerHeight - margin.top - margin.bottom,
@@ -174,9 +252,14 @@
 
                       svg.append("path")
                               .attr("d", line(data))
-                              .attr("class", "old-cases");     
+                              .attr("class", "old-cases");    
                     
+                           
           });
+          
+          
+          
+          
           
           d3.selectAll("input[value=newcases]")
           .on("click", function() {
