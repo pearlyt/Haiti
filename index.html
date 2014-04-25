@@ -113,6 +113,7 @@
   <div class="radiobuttons">
   <label><input checked="checked" type="radio" name="radio" value="newcases"> New Cases per Day</label>
   <label><input type="radio" name="radio" value="totalcases"> Total Cases </label>
+  <label><input type="radio" name="radio" value="mortalityrate"> Mortality Rate</label>
   </div>
     <div class="chart">
 </div>
@@ -221,41 +222,40 @@
                   .attr("class", "new-cases");
 
           
-          d3.selectAll("input[value=totalcases]")
-          .on("click", function() {
-            
-                    //get rid of stuff
-                   d3.select(".new-cases")
-                      .remove(); 
-                   d3.select(".new-cases-axis")
-                      .remove();
-                      
-                    var yScaleTotal = d3.scale.linear()
-                           .domain([0, d3.max(data,function(d){ return d.TotalCases})])
-                           .range([height, 0]);
-
-                       var yAxis = d3.svg.axis()
-                               .tickFormat(function(d) { return d; })
-                               .scale(yScaleTotal)
-                               .orient("left");
-
-                      svg.append("g")
-                              .attr("class", "axis")
-                              .attr("class", "old-cases-axis")
-                              .attr("transform", "translate(" + padding + ",0)")
-                              .call(yAxis);
-                            
-                        
-                      var line = d3.svg.line()
-                              .x(function(d) { return xScale(d.Unix); })
-                              .y(function(d) { return yScaleTotal(d.TotalCases); });
-
-                      svg.append("path")
-                              .attr("d", line(data))
-                              .attr("class", "old-cases");    
-                    
-                           
-          });
+          // d3.selectAll("input[value=totalcases]")
+          //         .on("click", function() {
+          //           
+          //                   //get rid of stuff
+          //                  d3.select(".new-cases")
+          //                     .remove(); 
+          //                  d3.select(".new-cases-axis")
+          //                     .remove();
+          //                     
+          //                   var yScaleTotal = d3.scale.linear()
+          //                          .domain([0, d3.max(data,function(d){ return d.TotalCases})])
+          //                          .range([height, 0]);
+          // 
+          //                      var yAxis = d3.svg.axis()
+          //                              .tickFormat(function(d) { return d; })
+          //                              .scale(yScaleTotal)
+          //                              .orient("left");
+          // 
+          //                     svg.append("g")
+          //                             .attr("class", "axis")
+          //                             .attr("class", "old-cases-axis")
+          //                             .attr("transform", "translate(" + padding + ",0)")
+          //                             .call(yAxis);
+          //                           
+          //                       
+          //                     var line = d3.svg.line()
+          //                             .x(function(d) { return xScale(d.Unix); })
+          //                             .y(function(d) { return yScaleTotal(d.TotalCases); });
+          // 
+          //                     svg.append("path")
+          //                             .attr("d", line(data))
+          //                             .attr("class", "old-cases");    
+          //                                  
+          //         });
           
           
           
@@ -269,6 +269,12 @@
                       .remove(); 
                    d3.select(".old-cases-axis")
                       .remove();
+                      
+                   //get rid of stuff
+                  d3.select(".mortality-rate")
+                     .remove(); 
+                  d3.select(".mortality-rate-axis")
+                     .remove();
                       
                       var yScale = d3.scale.linear()
                               .domain([0, d3.max(data,function(d){ return d.NewCases})])
@@ -302,6 +308,12 @@
                         .remove(); 
                      d3.select(".new-cases-axis")
                         .remove();
+                        
+                       //get rid of stuff
+                      d3.select(".mortality-rate")
+                         .remove(); 
+                      d3.select(".mortality-rate-axis")
+                         .remove();
 
                       var yScaleTotal = d3.scale.linear()
                              .domain([0, d3.max(data,function(d){ return d.TotalCases})])
@@ -328,6 +340,48 @@
                                 .attr("class", "old-cases");     
 
             });
+            
+            d3.selectAll("input[value=mortalityrate]")
+            .on("click", function() {
+
+                      //get rid of stuff
+                     d3.select(".new-cases")
+                        .remove(); 
+                     d3.select(".new-cases-axis")
+                        .remove();
+                    
+                     //get rid of stuff
+                    d3.select(".old-cases")
+                       .remove(); 
+                    d3.select(".old-cases-axis")
+                       .remove();
+
+                      var yScaleTotal = d3.scale.linear()
+                             .domain([0, d3.max(data,function(d){ return d.MortalityRate})])
+                             .range([height, 0]);
+
+                         var yAxis = d3.svg.axis()
+                                 .tickFormat(function(d) { return d; })
+                                 .scale(yScaleTotal)
+                                 .orient("left");
+
+                        svg.append("g")
+                                .attr("class", "axis")
+                                .attr("class", "mortality-rate-axis")
+                                .attr("transform", "translate(" + padding + ",0)")
+                                .call(yAxis);
+
+
+                        var line = d3.svg.line()
+                                .x(function(d) { return xScale(d.Unix); })
+                                .y(function(d) { return yScaleTotal(d.MortalityRate); });
+
+                        svg.append("path")
+                                .attr("d", line(data))
+                                .attr("class", "mortality-rate");    
+
+            });
+            
                 
   });
     
